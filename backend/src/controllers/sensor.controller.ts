@@ -13,7 +13,7 @@ export const getSensors = async (req: Request, res: Response) => {
 export const getSensorById = async (req: Request, res: Response) => {
   try {
     const sensor = await prisma.sensor.findUnique({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
     });
     if (sensor) {
       res.json(sensor);
@@ -28,7 +28,7 @@ export const getSensorById = async (req: Request, res: Response) => {
 export const updateSensor = async (req: Request, res: Response) => {
   try {
     const updatedSensor = await prisma.sensor.update({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       data: req.body,
     });
     res.json(updatedSensor);

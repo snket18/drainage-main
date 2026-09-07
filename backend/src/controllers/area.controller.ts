@@ -13,7 +13,7 @@ export const getAreas = async (req: Request, res: Response) => {
 export const getAreaById = async (req: Request, res: Response) => {
   try {
     const area = await prisma.area.findUnique({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
     });
     if (area) {
       res.json(area);
@@ -28,7 +28,7 @@ export const getAreaById = async (req: Request, res: Response) => {
 export const updateArea = async (req: Request, res: Response) => {
   try {
     const updatedArea = await prisma.area.update({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       data: req.body,
     });
     res.json(updatedArea);
