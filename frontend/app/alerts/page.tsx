@@ -35,7 +35,7 @@ export default function AlertsPage() {
       time: '11:00 PM',
       type: 'Rainfall Advisory',
       location: `${selectedArea.name} Catchment`,
-      message: 'Doppler weather radar projects rainfall velocity of 35-45 mm/hr within 30 minutes.',
+      message: 'Doppler weather radar projects rainfall intensity of 35-45 mm/hr within 30 minutes.',
       severity: 'info',
       action: 'Inspect storm grates and prepare dewatering teams on standby.',
     },

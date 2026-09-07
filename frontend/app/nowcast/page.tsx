@@ -19,8 +19,8 @@ import {
 export default function NowcastPage() {
   const { stepState, selectedArea } = useDemo();
 
-  const isShivajinagar = selectedArea.id === 'shivajinagar';
-  const activeRain = isShivajinagar ? stepState.rainfallMmHr : selectedArea.rainfallMmHr;
+  const isHindmata = selectedArea.id === 'hindmata';
+  const activeRain = isHindmata ? stepState.rainfallMmHr : selectedArea.rainfallMmHr;
 
   const timelineData = [
     { time: '10:00', rainfall: 5, accumulation: 2, status: 'Normal' },
@@ -45,7 +45,7 @@ export default function NowcastPage() {
           Rainfall nowcast forecast timeline
         </h1>
         <p className="text-sm text-slate-600 font-normal">
-          Localized high-resolution rainfall velocity and accumulation projection over catchments.
+          Localized high-resolution rainfall intensity and accumulation projection over catchments.
         </p>
       </div>
 

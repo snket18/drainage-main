@@ -34,7 +34,7 @@ export const generatePdfReport = (config: ReportConfig) => {
 
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  doc.text('Pune Municipal Corporation', 150, 14);
+  doc.text('Brihanmumbai Municipal Corporation', 150, 14);
 
   // Document Title & Metadata
   doc.setTextColor(15, 23, 42);
@@ -44,7 +44,7 @@ export const generatePdfReport = (config: ReportConfig) => {
 
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  doc.text(`Location: ${config.areaName}, Pune`, 14, 41);
+  doc.text(`Location: ${config.areaName}, Mumbai`, 14, 41);
   doc.text(`Time Frame: ${config.timePeriod}`, 14, 47);
   doc.text(`Report Ref: #PMC-882-${Math.floor(1000 + Math.random() * 9000)}`, 140, 41);
   doc.text(`Generated Date: ${new Date().toLocaleDateString('en-IN')}`, 140, 47);
@@ -63,7 +63,7 @@ export const generatePdfReport = (config: ReportConfig) => {
 
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
-  const summaryText = `This ${config.reportType} presents hydrodynamic observations, IoT sensor telemetry readings, and municipal intervention actions recorded for ${config.areaName}, Pune during ${config.timePeriod}. Peak rainfall velocity reached 85 mm/hr, causing localized underpass standing water depth of 48 cm. Mobile Dewatering Pump Unit #4 was dispatched and restored standing water level to normal range (14 cm) within 20 minutes.`;
+  const summaryText = `This ${config.reportType} presents hydrodynamic observations, IoT sensor telemetry readings, and municipal intervention actions recorded for ${config.areaName}, Mumbai during ${config.timePeriod}. Peak rainfall intensity reached 85 mm/hr, causing localized underpass standing water depth of 48 cm. Mobile Dewatering Pump Unit #4 was dispatched and restored standing water level to normal range (14 cm) within 20 minutes.`;
   
   const splitText = doc.splitTextToSize(summaryText, 180);
   doc.text(splitText, 14, currentY);
@@ -130,7 +130,7 @@ export const generatePdfReport = (config: ReportConfig) => {
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(15, 23, 42);
   doc.text('Official Resolution Status: RESOLVED', 14, 277);
-  doc.text('Pune Municipal Corporation • Flood Control Operations', 14, 282);
+  doc.text('Brihanmumbai Municipal Corporation • Flood Control Operations', 14, 282);
 
   doc.setFont('helvetica', 'normal');
   doc.text('Page 1 of 1', 180, 282);

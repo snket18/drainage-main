@@ -14,7 +14,7 @@ const MapLibreFloodMap = dynamic(
           LOADING MAPLIBRE GIS ENGINE...
         </p>
         <span className="text-[11px] text-slate-500 font-mono">
-          Shivajinagar, Ward 14 · CartoDB Dark Matter
+          Loading Regional Map Data · CartoDB Dark Matter
         </span>
       </div>
     ),
@@ -32,19 +32,27 @@ interface InteractiveMapProps {
 }
 
 import { useDemo } from '@/context/DemoContext';
-import { PUNE_WARDS_DATA } from '@/data/puneWardsData';
+import { MUMBAI_WARDS_DATA } from '@/data/mumbaiWardsData';
 
 export const InteractiveMap: React.FC<InteractiveMapProps> = (props) => {
   const { selectedArea } = useDemo();
-  // Map the selectedArea from search to the corresponding detailed PuneWardArea
-  const selectedWardArea = PUNE_WARDS_DATA.find(w => w.id === selectedArea.id) || {
-    ...PUNE_WARDS_DATA[0],
+  // Map the selectedArea from search to the corresponding detailed MumbaiWardArea
+  const selectedWardArea = React.useMemo(() => {
+    return MUMBAI_WARDS_DATA.find(w => w.id === selectedArea.id) || {
+
+    ...MUMBAI_WARDS_DATA[0],
     id: selectedArea.id,
     name: selectedArea.name,
-    center: [selectedArea.centerCoordinates.lng, selectedArea.centerCoordinates.lat],
-    originCoords: [selectedArea.centerCoordinates.lng - 0.005, selectedArea.centerCoordinates.lat - 0.005],
-    destinationCoords: [selectedArea.centerCoordinates.lng + 0.005, selectedArea.centerCoordinates.lat + 0.005],
+    center: [selectedArea.centerCoordinates.lng, selectedArea.centerCoordinates.lat] as [number, number],
+    originCoords: [selectedArea.centerCoordinates.lng - 0.005, selectedArea.centerCoordinates.lat - 0.005] as [number, number],
+    destinationCoords: [selectedArea.centerCoordinates.lng + 0.005, selectedArea.centerCoordinates.lat + 0.005] as [number, number],
+    floodedRouteGeoJSON: { type: 'FeatureCollection', features: [] } as GeoJSON.FeatureCollection,
+    safeBypassGeoJSON: { type: 'FeatureCollection', features: [] } as GeoJSON.FeatureCollection,
+    chokePoints: [],
+    bypassAdvice: 'No safe route available for this area.',
+    etaBypassMins: 0,
   };
+  }, [selectedArea]);
 
   return (
     <MapLibreFloodMap
@@ -53,6 +61,7 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = (props) => {
       onSelectHotspot={props.onSelectHotspot}
       onInspectTelemetry={props.onInspectTelemetry}
       selectedWardArea={selectedWardArea}
+      showLayerControl={props.showLayerControl}
     />
   );
 };

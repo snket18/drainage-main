@@ -21,11 +21,11 @@ import Link from 'next/link';
 export default function AreaOverviewPage() {
   const { selectedArea, stepState } = useDemo();
 
-  const isShivajinagar = selectedArea.id === 'shivajinagar';
-  const activeDepth = isShivajinagar ? stepState.maxWaterDepthCm : selectedArea.waterDepthCm;
-  const activeRain = isShivajinagar ? stepState.rainfallMmHr : selectedArea.rainfallMmHr;
-  const activeCapacity = isShivajinagar ? stepState.drainageCapacityPct : selectedArea.drainageCapacityPct;
-  const activeTimeToCritical = isShivajinagar ? stepState.timeToCriticalMins : selectedArea.timeToCriticalMins;
+  const isHindmata = selectedArea.id === 'hindmata';
+  const activeDepth = isHindmata ? stepState.maxWaterDepthCm : selectedArea.waterDepthCm;
+  const activeRain = isHindmata ? stepState.rainfallMmHr : selectedArea.rainfallMmHr;
+  const activeCapacity = isHindmata ? stepState.drainageCapacityPct : selectedArea.drainageCapacityPct;
+  const activeTimeToCritical = isHindmata ? stepState.timeToCriticalMins : selectedArea.timeToCriticalMins;
 
   return (
     <div className="space-y-6">

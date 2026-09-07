@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { MapFilterOption } from '@/components/map/MapLibreFloodMap';
 import { NowcastTimeSlider } from '@/components/map/NowcastTimeSlider';
 import { AreaRiskDrawer } from '@/components/map/AreaRiskDrawer';
-import { PUNE_WARDS_DATA, PuneWardArea } from '@/data/puneWardsData';
+import { MUMBAI_WARDS_DATA, MumbaiWardArea } from '@/data/mumbaiWardsData';
 import {
   runHydraulicSimulation,
   NOWCAST_TIME_STEPS,
@@ -43,7 +43,7 @@ const MapLibreFloodMap = dynamic(
             Loading Hydrodynamic GIS Model...
           </p>
           <p className="text-[11px] text-slate-500">
-            OpenStreetMap Raster Engine · Pune Municipal Transit Hubs
+            OpenStreetMap Raster Engine · Mumbai Municipal Transit Hubs
           </p>
         </div>
       </div>
@@ -55,7 +55,7 @@ export default function LiveMapPage() {
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [filterOption, setFilterOption] = useState<MapFilterOption>('ALL');
-  const [selectedWardId, setSelectedWardId] = useState<string>('shivajinagar');
+  const [selectedWardId, setSelectedWardId] = useState<string>('hindmata');
   const [showBypassRoute, setShowBypassRoute] = useState<boolean>(true);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [actionNotice, setActionNotice] = useState<string | null>(null);
@@ -63,8 +63,8 @@ export default function LiveMapPage() {
   const currentStep = NOWCAST_TIME_STEPS[currentStepIndex] || NOWCAST_TIME_STEPS[0];
 
   // Selected Ward Area data object
-  const selectedWardArea: PuneWardArea =
-    PUNE_WARDS_DATA.find((w) => w.id === selectedWardId) || PUNE_WARDS_DATA[0];
+  const selectedWardArea: MumbaiWardArea =
+    MUMBAI_WARDS_DATA.find((w) => w.id === selectedWardId) || MUMBAI_WARDS_DATA[0];
 
   // 1. Run Hydraulic Simulation Engine for current time step
   const simulationState = useMemo(() => {
@@ -73,9 +73,9 @@ export default function LiveMapPage() {
 
   // Filtered search results
   const searchFilteredWards = useMemo(() => {
-    if (!searchQuery.trim()) return PUNE_WARDS_DATA;
+    if (!searchQuery.trim()) return MUMBAI_WARDS_DATA;
     const q = searchQuery.toLowerCase();
-    return PUNE_WARDS_DATA.filter(
+    return MUMBAI_WARDS_DATA.filter(
       (w) =>
         w.name.toLowerCase().includes(q) ||
         w.ward.toLowerCase().includes(q) ||
@@ -83,7 +83,7 @@ export default function LiveMapPage() {
     );
   }, [searchQuery]);
 
-  const handleSelectWard = (ward: PuneWardArea) => {
+  const handleSelectWard = (ward: MumbaiWardArea) => {
     setSelectedWardId(ward.id);
     setShowBypassRoute(true);
     setActionNotice(`Navigated to ${ward.name} (${ward.ward}). Camera center flyTo executed.`);
@@ -110,13 +110,13 @@ export default function LiveMapPage() {
         <div>
           <div className="text-[11px] text-slate-500 font-semibold uppercase tracking-wider flex items-center gap-2 mb-1">
             <MapPin className="w-3.5 h-3.5 text-slate-600" />
-            <span>Pune Transit Hub Navigator · FloodTwin GIS</span>
+            <span>Mumbai Transit Hub Navigator · FloodTwin GIS</span>
           </div>
           <h1 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">
             Interactive Area Search & Safe Bypass Navigator
           </h1>
           <p className="text-xs text-slate-500 mt-0.5 font-normal">
-            Search major Pune flood-sensitive transit hubs (Swargate, Shivajinagar, Deccan, Sinhagad Rd) to trigger camera flyTo and render safe emergency bypass corridors.
+            Search major Mumbai flood-sensitive transit hubs (Swargate, Hindmata, Deccan, Sinhagad Rd) to trigger camera flyTo and render safe emergency bypass corridors.
           </p>
         </div>
 
@@ -134,7 +134,7 @@ export default function LiveMapPage() {
           </div>
 
           <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-sm border border-slate-200 text-xs">
-            {PUNE_WARDS_DATA.map((ward) => (
+            {MUMBAI_WARDS_DATA.map((ward) => (
               <button
                 key={ward.id}
                 onClick={() => handleSelectWard(ward)}

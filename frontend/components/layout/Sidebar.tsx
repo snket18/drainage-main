@@ -42,7 +42,7 @@ export const Sidebar: React.FC = () => {
     {
       title: 'MONITOR',
       items: [
-        { name: 'Dashboard', path: '/', icon: LayoutDashboard },
+        { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
         { name: 'Live Map', path: '/map', icon: Map },
         { name: 'Rainfall', path: '/nowcast', icon: CloudRain },
         { name: 'Drainage', path: '/drainage', icon: GitMerge },
@@ -80,7 +80,7 @@ export const Sidebar: React.FC = () => {
           <h1 className="font-extrabold text-base tracking-tight text-slate-900">
             FloodTwin
           </h1>
-          <p className="text-[11px] text-slate-500 font-medium">Urban GIS Nowcasting</p>
+          <p className="text-[11px] text-slate-500 font-medium">Urban Flood Intelligence</p>
         </div>
       </div>
 
@@ -115,13 +115,13 @@ export const Sidebar: React.FC = () => {
                 <Link
                   key={item.path}
                   href={item.path}
-                  className={`flex items-center gap-2.5 px-3 py-2 rounded-sm text-xs font-semibold transition-all ${
+                  className={`flex items-center gap-2.5 px-3 py-2 text-xs font-semibold transition-all ${
                     isActive
-                      ? 'bg-slate-100 text-slate-900 font-extrabold border border-slate-200 shadow-xs'
-                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                      ? 'bg-slate-900 text-white font-bold rounded-sm shadow-xs'
+                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-sm'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-slate-900' : 'text-slate-400'}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                   <span>{item.name}</span>
                 </Link>
               );

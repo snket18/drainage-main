@@ -1,10 +1,10 @@
 // Graph-Based Hydraulic Drainage Model Engine for FloodTwin
 import {
-  PUNE_DRAINAGE_NODES,
-  PUNE_DRAINAGE_EDGES,
+  MUMBAI_DRAINAGE_NODES,
+  MUMBAI_DRAINAGE_EDGES,
   DrainageNodeData,
   DrainageEdgeData,
-} from '@/data/puneDrainageNetwork';
+} from '@/data/mumbaiDrainageNetwork';
 
 export interface CalculatedNodeState extends DrainageNodeData {
   runoffLps: number;
@@ -54,7 +54,7 @@ export function runHydraulicSimulation(rainfallMmHr: number, timeOffsetMins = 0)
   // 1. Calculate surface runoff for each node using the Rational Method
   const nodeMap = new Map<string, CalculatedNodeState>();
 
-  PUNE_DRAINAGE_NODES.forEach((node) => {
+  MUMBAI_DRAINAGE_NODES.forEach((node) => {
     const runoffLps = calculateRationalRunoffLps(rainfallMmHr, node.catchmentAreaSqM);
     const nodeState: CalculatedNodeState = {
       ...node,
@@ -69,7 +69,7 @@ export function runHydraulicSimulation(rainfallMmHr: number, timeOffsetMins = 0)
   });
 
   // 2. Propagate hydraulic flow through DAG pipe edges
-  PUNE_DRAINAGE_EDGES.forEach((edge) => {
+  MUMBAI_DRAINAGE_EDGES.forEach((edge) => {
     const sourceNode = nodeMap.get(edge.fromNodeId);
     const targetNode = nodeMap.get(edge.toNodeId);
 

@@ -8,8 +8,8 @@ import { GitMerge, AlertTriangle, CheckCircle, Wrench } from 'lucide-react';
 export default function DrainagePage() {
   const { stepState, pipes, selectedArea } = useDemo();
 
-  const isShivajinagar = selectedArea.id === 'shivajinagar';
-  const activeCapacity = isShivajinagar ? stepState.drainageCapacityPct : selectedArea.drainageCapacityPct;
+  const isHindmata = selectedArea.id === 'hindmata';
+  const activeCapacity = isHindmata ? stepState.drainageCapacityPct : selectedArea.drainageCapacityPct;
 
   return (
     <div className="space-y-6">
@@ -49,7 +49,7 @@ export default function DrainagePage() {
         <MetricCard
           title="Sluice Gate #2 position"
           value="30% Open"
-          subtitle="Mutha outfall relief buffer"
+          subtitle="Mithi outfall relief buffer"
           icon={Wrench}
           variant="cyan"
         />
@@ -136,7 +136,7 @@ export default function DrainagePage() {
             </p>
           </div>
           <div className="p-4 rounded-sm bg-slate-50 border border-slate-200 space-y-1">
-            <div className="font-bold text-slate-900">Mutha River Outfall Stage Height</div>
+            <div className="font-bold text-slate-900">Mithi River Outfall Stage Height</div>
             <p className="text-slate-600 font-normal">
               River water level at 2.8m creates backwater resistance against gravity outfall lines at Dengle Gate.
             </p>

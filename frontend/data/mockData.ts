@@ -99,7 +99,7 @@ export interface EvacuationRoute {
   description: string;
 }
 
-export const PUNE_SHIVAJINAGAR_CENTER = { lat: 18.5308, lng: 73.8474 };
+export const MUMBAI_HINDMATA_CENTER = { lat: 18.5308, lng: 73.8474 };
 
 export const SENSORS_DATA: Sensor[] = [
   {
@@ -175,7 +175,7 @@ export const SENSORS_DATA: Sensor[] = [
   {
     id: 'S-06',
     name: 'COEP Technological Univ Doppler Rain',
-    location: 'COEP Ground Shivajinagar',
+    location: 'COEP Ground Hindmata',
     type: 'rain_gauge',
     value: 5,
     unit: 'mm/hr',
@@ -227,8 +227,8 @@ export const CCTV_DATA: CCTVCamera[] = [
   },
   {
     id: 'CAM-04',
-    name: 'CAM #4 - Shivajinagar Railway Station Subway',
-    location: 'Pune Railway Underpass',
+    name: 'CAM #4 - Hindmata Railway Station Subway',
+    location: 'Mumbai Railway Underpass',
     status: 'online',
     aiWaterDetection: false,
     waterDepthCm: 6,
@@ -337,8 +337,8 @@ export const FIELD_WORKERS_DATA: FieldWorker[] = [
     team: 'PMC Emergency Dewatering Unit 1',
     role: 'Mobile Dewatering Specialist',
     contact: '+91 98220 11234',
-    assignedTask: 'Standby at Shivajinagar Depot',
-    locationName: 'Shivajinagar Municipal Ward Office',
+    assignedTask: 'Standby at Hindmata Depot',
+    locationName: 'Hindmata Municipal Ward Office',
     coordinates: { lat: 18.5320, lng: 73.8490 },
     status: 'IDLE',
     etaMins: 0,

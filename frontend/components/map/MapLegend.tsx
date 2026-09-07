@@ -7,7 +7,7 @@ export const MapLegend: React.FC = () => {
     <div className="bg-white/95 backdrop-blur-md p-3 rounded-sm border border-slate-200 shadow-sm text-xs space-y-2 text-slate-800 pointer-events-auto">
       <div className="flex items-center justify-between border-b border-slate-100 pb-1">
         <span className="font-bold text-[11px] text-slate-900 uppercase tracking-wider">Map Legend</span>
-        <span className="text-[10px] text-slate-400 font-mono">Pune Municipal GIS</span>
+        <span className="text-[10px] text-slate-400 font-mono">Mumbai Municipal GIS</span>
       </div>
 
       <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[11px] font-medium">

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { PuneWardArea } from '@/data/puneWardsData';
+import { MumbaiWardArea } from '@/data/mumbaiWardsData';
 import {
   AlertTriangle,
   CheckCircle2,
@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 
 interface AreaRiskDrawerProps {
-  area: PuneWardArea;
+  area: MumbaiWardArea;
   showBypassRoute: boolean;
   onToggleBypassRoute: () => void;
   onClose?: () => void;
@@ -151,7 +151,7 @@ export const AreaRiskDrawer: React.FC<AreaRiskDrawerProps> = ({
       </div>
 
       <div className="text-[11px] text-slate-400 text-center font-mono pt-3 border-t border-slate-100">
-        FloodTwin Telemetry Engine · Pune GIS
+        FloodTwin Telemetry Engine · Mumbai GIS
       </div>
     </div>
   );

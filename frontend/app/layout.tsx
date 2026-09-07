@@ -7,7 +7,7 @@ import { TopHeader } from '@/components/layout/TopHeader';
 export const metadata: Metadata = {
   title: 'FloodTwin - Urban Flood Intelligence Platform',
   description:
-    'Urban Flood Nowcasting & Decision Support System for Shivajinagar, Pune Municipal Corporation.',
+    'Urban Flood Nowcasting & Decision Support System for Hindmata, Brihanmumbai Municipal Corporation.',
 };
 
 export default function RootLayout({

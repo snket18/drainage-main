@@ -1,14 +1,14 @@
 // Safe Bypass Route Utility for FloodTwin
-import { PUNE_WARDS_DATA, PuneWardArea } from '@/data/puneWardsData';
+import { MUMBAI_WARDS_DATA, MumbaiWardArea } from '@/data/mumbaiWardsData';
 
-export function getWardById(id: string): PuneWardArea | undefined {
-  return PUNE_WARDS_DATA.find((w) => w.id.toLowerCase() === id.toLowerCase() || w.name.toLowerCase() === id.toLowerCase());
+export function getWardById(id: string): MumbaiWardArea | undefined {
+  return MUMBAI_WARDS_DATA.find((w) => w.id.toLowerCase() === id.toLowerCase() || w.name.toLowerCase() === id.toLowerCase());
 }
 
-export function searchPuneLocations(query: string): PuneWardArea[] {
-  if (!query.trim()) return PUNE_WARDS_DATA;
+export function searchMumbaiLocations(query: string): MumbaiWardArea[] {
+  if (!query.trim()) return MUMBAI_WARDS_DATA;
   const q = query.toLowerCase();
-  return PUNE_WARDS_DATA.filter(
+  return MUMBAI_WARDS_DATA.filter(
     (w) =>
       w.name.toLowerCase().includes(q) ||
       w.ward.toLowerCase().includes(q) ||

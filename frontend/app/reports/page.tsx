@@ -5,7 +5,7 @@ import { useDemo } from '@/context/DemoContext';
 import { MetricCard } from '@/components/ui/MetricCard';
 import { generatePdfReport } from '@/utils/pdfGenerator';
 import { BarChart3, Download, FileText, Calendar, CheckCircle, FilePlus, X } from 'lucide-react';
-import { PUNE_AREAS } from '@/data/searchData';
+import { MUMBAI_AREAS } from '@/data/searchData';
 import {
   BarChart,
   Bar,
@@ -116,7 +116,7 @@ export default function ReportsPage() {
         <MetricCard
           title="Primary Bottleneck"
           value="Culvert C-14"
-          subtitle="Mutha Confluence Outfall"
+          subtitle="Mithi Confluence Outfall"
           icon={FileText}
           variant="amber"
         />
@@ -198,7 +198,7 @@ export default function ReportsPage() {
                   onChange={(e) => setReportArea(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-300 rounded-sm p-2.5 font-bold text-slate-900 focus:outline-none"
                 >
-                  {Object.values(PUNE_AREAS).map((a) => (
+                  {Object.values(MUMBAI_AREAS).map((a) => (
                     <option key={a.id} value={a.name}>
                       {a.name} ({a.ward})
                     </option>

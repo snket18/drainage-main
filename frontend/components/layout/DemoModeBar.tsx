@@ -33,7 +33,7 @@ export const DemoModeBar: React.FC = () => {
           <div className="text-xs">
             <span className="text-slate-400">Current Phase: </span>
             <span className={`font-semibold ${
-              stepState.phase === 'BEFORE FLOOD' ? 'text-amber-400' :
+              stepState.phase === 'PRE-FLOOD' ? 'text-amber-400' :
               stepState.phase === 'FLOOD OCCURS' ? 'text-red-400' : 'text-emerald-400'
             }`}>
               {stepState.phase}

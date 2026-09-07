@@ -12,7 +12,7 @@ import {
   PipeNetwork,
   FieldWorker,
 } from '@/data/mockData';
-import { PUNE_AREAS, AreaData, SearchResultItem } from '@/data/searchData';
+import { MUMBAI_AREAS, AreaData, SearchResultItem } from '@/data/searchData';
 
 interface DemoContextType {
   currentStepIndex: number;
@@ -63,7 +63,7 @@ const DemoContext = createContext<DemoContextType | undefined>(undefined);
 export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [selectedAreaId, setSelectedAreaId] = useState<string>('shivajinagar');
+  const [selectedAreaId, setSelectedAreaId] = useState<string>('hindmata');
   const [recentSearches, setRecentSearches] = useState<SearchResultItem[]>([]);
 
   const [simulatorOverrides, setSimulatorOverrides] = useState({
@@ -75,13 +75,71 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [dynamicSelectedArea, setDynamicSelectedArea] = useState<AreaData | null>(null);
 
-  const selectedArea = dynamicSelectedArea || PUNE_AREAS[selectedAreaId] || PUNE_AREAS.shivajinagar;
+  const [dbSensors, setDbSensors] = useState<Sensor[]>(SENSORS_DATA);
+  const [dbAreas, setDbAreas] = useState<Record<string, Partial<AreaData>>>({});
+  const [liveWeatherRainfall, setLiveWeatherRainfall] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchBackendData = async () => {
+      try {
+        const [areasRes, sensorsRes] = await Promise.all([
+          fetch('http://localhost:5100/api/areas'),
+          fetch('http://localhost:5100/api/sensors')
+        ]);
+        
+        if (areasRes.ok) {
+          const areas: any[] = await areasRes.json();
+          const areaDict: Record<string, Partial<AreaData>> = {};
+          areas.forEach((a: any) => {
+            areaDict[a.id] = {
+              waterDepthCm: a.waterDepthCm,
+              rainfallMmHr: a.rainfallMmHr,
+              drainageCapacityPct: a.drainageCapacityPct,
+              status: a.status,
+              timeToCriticalMins: a.timeToCriticalMins,
+            };
+          });
+          setDbAreas(areaDict);
+        }
+
+        if (sensorsRes.ok) {
+          const sensors: any[] = await sensorsRes.json();
+          setDbSensors(prev => {
+            const merged = [...prev];
+            sensors.forEach((ms: any) => {
+              const idx = merged.findIndex(x => x.id === ms.id);
+              if (idx >= 0) {
+                merged[idx] = {
+                  ...merged[idx],
+                  value: ms.value,
+                  unit: ms.unit,
+                  battery: ms.batteryPct,
+                };
+              }
+            });
+            return merged;
+          });
+        }
+      } catch (e) {
+        console.error("Failed to fetch from Express backend", e);
+      }
+    };
+    fetchBackendData();
+    const interval = setInterval(fetchBackendData, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const staticArea = MUMBAI_AREAS[selectedAreaId] || MUMBAI_AREAS.hindmata;
+  const dbOverrides = dbAreas[selectedAreaId] || {};
+  const computedSelectedArea = { ...staticArea, ...dbOverrides };
+  const selectedArea = dynamicSelectedArea || computedSelectedArea;
+
   const stepState = DEMO_STEPS[currentStepIndex];
 
   const updateOverridesForStepAndArea = (stepIdx: number, areaId: string) => {
-    const targetArea = PUNE_AREAS[areaId] || PUNE_AREAS.shivajinagar;
+    const targetArea = MUMBAI_AREAS[areaId] || MUMBAI_AREAS.hindmata;
     const targetStep = DEMO_STEPS[stepIdx];
-    const activeRain = targetArea.id === 'shivajinagar' ? targetStep.rainfallMmHr : targetArea.rainfallMmHr;
+    const activeRain = targetArea.id === 'hindmata' ? targetStep.rainfallMmHr : targetArea.rainfallMmHr;
     setSimulatorOverrides({
       rainfallMmHr: activeRain,
       muthaRiverLevelM: targetStep.muthaRiverLevelM,
@@ -142,7 +200,7 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const resetSimulatorOverrides = () => {
-    const activeRain = selectedArea.id === 'shivajinagar' ? stepState.rainfallMmHr : selectedArea.rainfallMmHr;
+    const activeRain = selectedArea.id === 'hindmata' ? stepState.rainfallMmHr : selectedArea.rainfallMmHr;
     setSimulatorOverrides({
       rainfallMmHr: activeRain,
       muthaRiverLevelM: stepState.muthaRiverLevelM,
@@ -159,9 +217,9 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Derive dynamic sensors based on current stepState and selectedArea
-  const baseMaxWaterDepth = selectedArea.id === 'shivajinagar' ? stepState.maxWaterDepthCm : selectedArea.waterDepthCm;
-  const baseRainfall = selectedArea.id === 'shivajinagar' ? stepState.rainfallMmHr : selectedArea.rainfallMmHr;
-  const baseCapacity = selectedArea.id === 'shivajinagar' ? stepState.drainageCapacityPct : selectedArea.drainageCapacityPct;
+  const baseMaxWaterDepth = selectedArea.id === 'hindmata' ? stepState.maxWaterDepthCm : selectedArea.waterDepthCm;
+  const baseRainfall = selectedArea.id === 'hindmata' ? stepState.rainfallMmHr : selectedArea.rainfallMmHr;
+  const baseCapacity = selectedArea.id === 'hindmata' ? stepState.drainageCapacityPct : selectedArea.drainageCapacityPct;
 
   const [jitteredData, setJitteredData] = useState<{ rainfallMmHr: number, waterDepthCm: number, drainageCapacityPct: number } | null>(null);
 
@@ -181,11 +239,31 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => clearInterval(interval);
   }, [baseRainfall, baseMaxWaterDepth, baseCapacity]);
 
+  useEffect(() => {
+    if (!selectedArea?.centerCoordinates) return;
+    const fetchLiveWeather = async () => {
+      try {
+        const { lat, lng } = selectedArea.centerCoordinates;
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=precipitation&timezone=Asia%2FKolkata`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data?.current?.precipitation !== undefined) {
+          setLiveWeatherRainfall(data.current.precipitation);
+        }
+      } catch (err) {
+        console.error("Open-Meteo fetch failed", err);
+      }
+    };
+    fetchLiveWeather();
+    const interval = setInterval(fetchLiveWeather, 60000);
+    return () => clearInterval(interval);
+  }, [selectedArea?.centerCoordinates?.lat, selectedArea?.centerCoordinates?.lng]);
+
   const activeMaxWaterDepth = jitteredData?.waterDepthCm ?? baseMaxWaterDepth;
-  const activeRainfall = jitteredData?.rainfallMmHr ?? baseRainfall;
+  const activeRainfall = liveWeatherRainfall !== null ? liveWeatherRainfall : (jitteredData?.rainfallMmHr ?? baseRainfall);
   const activeCapacity = jitteredData?.drainageCapacityPct ?? baseCapacity;
 
-  const dynamicSensors: Sensor[] = SENSORS_DATA.map((s) => {
+  const dynamicSensors: Sensor[] = dbSensors.map((s) => {
     if (s.id === 'S-01') {
       return {
         ...s,
@@ -218,7 +296,7 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const dynamicCCTV: CCTVCamera[] = CCTV_DATA.map((cam) => {
     if (cam.id === 'CAM-01') {
-      const isWaterlogged = selectedArea.id === 'shivajinagar' ? stepState.cctvStatus.aiWaterDetected : selectedArea.waterDepthCm > 20;
+      const isWaterlogged = selectedArea.id === 'hindmata' ? stepState.cctvStatus.aiWaterDetected : selectedArea.waterDepthCm > 20;
       return {
         ...cam,
         aiWaterDetection: isWaterlogged,

@@ -51,7 +51,7 @@ export default function LiveMapPage() {
     },
     {
       id: 'HZ-03',
-      name: 'Dengle Sluice Gate (Mutha Right Bank)',
+      name: 'Dengle Sluice Gate (Mithi Right Bank)',
       coordinates: '18.5289° N, 73.8532° E',
       waterDepthCm: Math.max(stepState.maxWaterDepthCm - 30, 0),
       capacityPct: Math.min(stepState.drainageCapacityPct + 10, 95),
@@ -92,7 +92,7 @@ export default function LiveMapPage() {
             Live Interactive GIS Flood Management Map
           </h1>
           <p className="text-sm text-slate-600 font-normal">
-            Real Pune base map with hydrodynamics, IoT sensors, CCTV surveillance, and flood-aware routing overlays.
+            Real base map with hydrodynamics, IoT sensors, CCTV surveillance, and flood-aware routing overlays.
           </p>
         </div>
 
@@ -149,7 +149,7 @@ export default function LiveMapPage() {
             <div className="border-b border-slate-200 pb-3">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Selected Area</span>
-                <span className="text-[11px] font-semibold text-slate-400 font-mono">Pune, MH</span>
+                <span className="text-[11px] font-semibold text-slate-400 font-mono">Regional Area</span>
               </div>
               <h2 className="text-lg font-bold text-slate-900 mt-0.5">{selectedArea.name}</h2>
               <div className="text-xs text-slate-600 font-medium">{selectedArea.ward} · {selectedArea.zone}</div>
@@ -199,10 +199,10 @@ export default function LiveMapPage() {
                   <div className="bg-red-50 border border-red-200 p-3.5 rounded-sm space-y-1.5 text-xs">
                     <div className="flex items-center gap-1.5 text-red-800 font-bold">
                       <AlertTriangle className="w-4 h-4 text-red-600" />
-                      <span>⚠ FC Road Underpass Blocked</span>
+                      <span>⚠ Critical Inundation Detected</span>
                     </div>
                     <p className="text-red-700 font-medium text-[11px]">
-                      Predicted water depth: <strong>{stepState.maxWaterDepthCm} cm</strong>. Direct subway arterial is impassable.
+                      Predicted water depth: <strong>{stepState.maxWaterDepthCm} cm</strong>. Direct route is impassable.
                     </p>
                     <button
                       onClick={() => setActiveRightTab('routes')}
@@ -250,7 +250,7 @@ export default function LiveMapPage() {
               <div className="space-y-3  fade-in">
                 {isFlooded && (
                   <div className="bg-amber-50 border border-amber-200 p-2.5 rounded-sm text-[11px] text-amber-900 font-medium">
-                    "Route updated because FC Road Underpass is predicted to be flooded."
+                    "Route updated due to predicted localized flooding."
                   </div>
                 )}
 
@@ -270,8 +270,8 @@ export default function LiveMapPage() {
                     <span className="font-semibold text-emerald-700 text-[11px]">0 cm depth</span>
                   </div>
                   <div>
-                    <h4 className="font-bold text-slate-900 text-xs">FC Road Flyover via Sancheti Upper Ramp</h4>
-                    <p className="text-[11px] text-slate-600 mt-0.5">Elevated overpass route bypassing low-lying underpass sump.</p>
+                    <h4 className="font-bold text-slate-900 text-xs">Elevated Safe Corridor</h4>
+                    <p className="text-[11px] text-slate-600 mt-0.5">Elevated overpass route bypassing low-lying sump.</p>
                   </div>
                   <div className="flex items-center justify-between text-[11px] text-slate-700 font-semibold pt-1 border-t border-slate-200/60">
                     <span>Dist: 3.8 km</span>
@@ -298,7 +298,7 @@ export default function LiveMapPage() {
                     </span>
                   </div>
                   <div>
-                    <h4 className="font-bold text-slate-900 text-xs">JM Road Underpass Direct Arterial</h4>
+                    <h4 className="font-bold text-slate-900 text-xs">Direct Arterial Route</h4>
                     <p className="text-[11px] text-slate-600 mt-0.5">Direct underpass route. Subject to waterlogging pooling.</p>
                   </div>
                   <div className="flex items-center justify-between text-[11px] text-slate-700 font-semibold pt-1 border-t border-slate-200/60">
@@ -408,7 +408,7 @@ export default function LiveMapPage() {
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-bold text-white flex items-center gap-2">
             <Layers className="w-4 h-4 text-cyan-400" />
-            <span>Shivajinagar Municipal Hotspot Telemetry Matrix</span>
+            <span>Municipal Hotspot Telemetry Matrix</span>
           </h3>
           <span className="text-xs text-slate-400">Updating Live</span>
         </div>

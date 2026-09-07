@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Basic User Model for Authentication
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      String   @default("operator") // e.g., 'operator', 'admin'
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Area/Ward Data
+model Area {
+  id                String   @id // e.g., 'shivajinagar'
+  name              String
+  ward              String
+  zone              String
+  description       String?
+  waterDepthCm      Float    @default(0)
+  rainfallMmHr      Float    @default(0)
+  drainageCapacityPct Float  @default(0)
+  timeToCriticalMins Int?
+  status            String   @default("NORMAL") // e.g., 'NORMAL', 'WARNING', 'CRITICAL'
+  centerLat         Float
+  centerLng         Float
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// Sensors
+model Sensor {
+  id          String   @id // e.g., 'S-01'
+  type        String   // e.g., 'Ultrasonic Water Level', 'Rain Gauge'
+  status      String   @default("active") // 'active', 'offline', 'maintenance'
+  value       Float    @default(0)
+  unit        String   // 'cm', 'mm/h', '%'
+  lat         Float
+  lng         Float
+  batteryPct  Int      @default(100)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

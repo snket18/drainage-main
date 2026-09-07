@@ -117,7 +117,7 @@ export default function SimulatorPage() {
             />
           </div>
 
-          {/* Slider 2: Mutha River Level */}
+          {/* Slider 2: Mithi River Level */}
           <div className="space-y-1.5">
             <div className="flex justify-between text-xs font-semibold text-slate-800">
               <span>River stage height</span>

@@ -87,7 +87,7 @@ export const GlobalSearch: React.FC = () => {
         description: 'Dynamically searched location via OpenStreetMap.',
         riskDrivers: [],
         predictionFactors: { explanation: 'No AI prediction available for external areas.', confidencePct: 0, leadTimeMins: 0 },
-        interventionRationale: { recommendedAction: 'N/A', proximity: '', availableCapacity: '', expectedEffect: '', responseTimeMins: 0, reasoning: '' },
+        interventionRationale: { recommendedAction: 'N/A', proximity: '', availableCapacity: '', expectedEffect: '', responseTimeMins: 0, reasoning: '', alternativeAction: 'N/A' },
         sensorsCount: 0,
         cctvCount: 0,
         centerCoordinates: item.dynamicCoords,
@@ -102,7 +102,6 @@ export const GlobalSearch: React.FC = () => {
     addRecentSearch(item);
     setQuery('');
     setIsOpen(false);
-    router.push('/');
   };
 
   const getCategoryIcon = (category: SearchResultItem['category']) => {

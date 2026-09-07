@@ -4,10 +4,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useDemo } from '@/context/DemoContext';
-import { PUNE_CENTER, getMuthaRiverGeoJSON } from '@/data/puneDrainageNetwork';
+import { MUMBAI_CENTER, getMithiRiverGeoJSON } from '@/data/mumbaiDrainageNetwork';
 import { runHydraulicSimulation, CalculatedNodeState, CalculatedEdgeState } from '@/utils/drainageGraphEngine';
 import { RouteResult } from '@/utils/emergencyRouting';
-import { PUNE_WARDS_DATA, PuneWardArea } from '@/data/puneWardsData';
+import { MUMBAI_WARDS_DATA, MumbaiWardArea } from '@/data/mumbaiWardsData';
 import { Layers, Compass, Navigation, AlertOctagon } from 'lucide-react';
 
 export type MapFilterOption = 'ALL' | 'INUNDATED_ONLY' | 'CLEAR_ONLY';
@@ -20,10 +20,11 @@ interface MapLibreFloodMapProps {
   nodes?: CalculatedNodeState[];
   edges?: CalculatedEdgeState[];
   activeRoute?: RouteResult | null;
-  selectedWardArea?: PuneWardArea | null;
+  selectedWardArea?: MumbaiWardArea | null;
   showBypassOverlay?: boolean;
   onSelectHotspot?: (hotspotId: string) => void;
   onInspectTelemetry?: (sensorId: string) => void;
+  showLayerControl?: boolean;
 }
 
 export default function MapLibreFloodMap({
@@ -36,6 +37,7 @@ export default function MapLibreFloodMap({
   activeRoute: propActiveRoute = null,
   selectedWardArea: propSelectedWardArea = null,
   showBypassOverlay = true,
+  showLayerControl = true,
   onSelectHotspot,
   onInspectTelemetry,
 }: MapLibreFloodMapProps) {
@@ -45,6 +47,7 @@ export default function MapLibreFloodMap({
   const markersRef = useRef<{ [id: string]: { marker: maplibregl.Marker; element: HTMLDivElement } }>({});
   const dynamicMarkersRef = useRef<maplibregl.Marker[]>([]);
   const routePinMarkersRef = useRef<maplibregl.Marker[]>([]);
+  const overpassMarkersRef = useRef<maplibregl.Marker[]>([]);
 
   const [mapLoaded, setMapLoaded] = useState(false);
   const [activeLayers, setActiveLayers] = useState({
@@ -53,9 +56,10 @@ export default function MapLibreFloodMap({
     inundationZones: true,
     nodeMarkers: true,
     emergencyRoute: true,
+    dopplerRadar: true,
   });
 
-  const activeWard = propSelectedWardArea || PUNE_WARDS_DATA[0];
+  const activeWard = propSelectedWardArea || MUMBAI_WARDS_DATA[0];
 
   useEffect(() => {
     if (mapRef.current && mapLoaded && activeWard) {
@@ -78,6 +82,7 @@ export default function MapLibreFloodMap({
             tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
             tileSize: 256,
             attribution: '&copy; OpenStreetMap Contributors',
+            maxzoom: 19,
           },
         },
         layers: [
@@ -90,7 +95,7 @@ export default function MapLibreFloodMap({
           },
         ],
       },
-      center: PUNE_CENTER, // [73.8567, 18.5204] Shivajinagar, Pune
+      center: MUMBAI_CENTER, // [73.8567, 18.5204] Hindmata, Mumbai
       zoom: 14,
     });
 
@@ -103,10 +108,44 @@ export default function MapLibreFloodMap({
       setMapLoaded(true);
       map.resize();
 
+      // Fetch RainViewer timestamp for Doppler Radar
+      fetch('https://api.rainviewer.com/public/weather-maps.json')
+        .then((res) => res.json())
+        .then((data) => {
+          const past = data.radar?.past;
+          if (past && past.length > 0) {
+            const latest = past[past.length - 1];
+            map.addSource('rainviewer-source', {
+              type: 'raster',
+              tiles: [
+                `https://tilecache.rainviewer.com${latest.path}/256/{z}/{x}/{y}/2/1_1.png`,
+              ],
+              tileSize: 256,
+              minzoom: 0,
+              maxzoom: 7,
+            });
+
+            map.addLayer({
+              id: 'rainviewer-layer',
+              type: 'raster',
+              source: 'rainviewer-source',
+              paint: {
+                'raster-opacity': 0.6,
+              },
+            });
+            
+            // Re-order layer to sit below UI polygons but above basemap
+            if (map.getLayer('mutha-river-glow')) {
+              map.moveLayer('rainviewer-layer', 'mutha-river-glow');
+            }
+          }
+        })
+        .catch((err) => console.error('Failed to load RainViewer radar', err));
+
       // 1. Mutha River Channel Layer
       map.addSource('mutha-river-source', {
         type: 'geojson',
-        data: getMuthaRiverGeoJSON(),
+        data: getMithiRiverGeoJSON(),
       });
 
       map.addLayer({
@@ -152,7 +191,7 @@ export default function MapLibreFloodMap({
       });
 
       // 3. Hotspot Inundation Depth Polygons Source & Layer
-      map.addSource('pune-hotspots-source', {
+      map.addSource('mumbai-hotspots-source', {
         type: 'geojson',
         data: { type: 'FeatureCollection', features: [] },
       });
@@ -160,7 +199,7 @@ export default function MapLibreFloodMap({
       map.addLayer({
         id: 'hotspot-polygons-fill',
         type: 'fill',
-        source: 'pune-hotspots-source',
+        source: 'mumbai-hotspots-source',
         paint: {
           'fill-color': ['get', 'fillColor'],
           'fill-opacity': ['get', 'fillOpacity'],
@@ -170,7 +209,7 @@ export default function MapLibreFloodMap({
       map.addLayer({
         id: 'hotspot-polygons-outline',
         type: 'line',
-        source: 'pune-hotspots-source',
+        source: 'mumbai-hotspots-source',
         paint: {
           'line-color': ['get', 'strokeColor'],
           'line-width': 2,
@@ -191,8 +230,8 @@ export default function MapLibreFloodMap({
         layout: { 'line-join': 'round', 'line-cap': 'round' },
         paint: {
           'line-color': '#f43f5e',
-          'line-width': 12,
-          'line-opacity': 0.25,
+          'line-width': 10,
+          'line-opacity': 0.15,
         },
       });
 
@@ -284,9 +323,9 @@ export default function MapLibreFloodMap({
     const simResult = runHydraulicSimulation(activeRain, 0);
 
     // Update Hydraulic & Inundation GeoJSON Sources
-    if (map.getSource('pune-hotspots-source')) {
+    if (map.getSource('mumbai-hotspots-source')) {
       const geoJson = propInundatedGeoJSON || simResult.inundatedHotspotsGeoJSON;
-      (map.getSource('pune-hotspots-source') as maplibregl.GeoJSONSource).setData(geoJson);
+      (map.getSource('mumbai-hotspots-source') as maplibregl.GeoJSONSource).setData(geoJson);
     }
 
     if (map.getSource('drainage-pipes-source')) {
@@ -311,45 +350,47 @@ export default function MapLibreFloodMap({
         );
       }
 
-      // Point A (Origin): Clean circular ring (14px) at FC Road
-      const elA = document.createElement('div');
-      elA.className = 'w-[14px] h-[14px] rounded-sm bg-white border-3 border-emerald-600 shadow-sm cursor-pointer transform hover:scale-125 transition-transform';
-      const popupA = new maplibregl.Popup({ offset: 10 }).setHTML(`
-        <div class="bg-white p-2.5 rounded-sm border border-slate-200 text-slate-900 shadow-sm text-xs font-sans">
-          <span class="text-[10px] font-mono text-emerald-600 font-bold uppercase">ORIGIN (POINT A)</span>
-          <h4 class="font-bold text-slate-900">Fergusson College Road</h4>
-        </div>
-      `);
-      const markerA = new maplibregl.Marker({ element: elA })
-        .setLngLat(activeWard.originCoords)
-        .setPopup(popupA)
-        .addTo(map);
-      routePinMarkersRef.current.push(markerA);
+      if (activeWard.safeBypassGeoJSON?.features?.length > 0) {
+        // Point A (Origin): Clean circular ring (14px)
+        const elA = document.createElement('div');
+        elA.className = 'w-[14px] h-[14px] rounded-sm bg-white border-3 border-emerald-600 shadow-sm cursor-pointer transform hover:scale-125 transition-transform';
+        const popupA = new maplibregl.Popup({ offset: 10 }).setHTML(`
+          <div class="bg-white p-2.5 rounded-sm border border-slate-200 text-slate-900 shadow-sm text-xs font-sans">
+            <span class="text-[10px] font-mono text-emerald-600 font-bold uppercase">ORIGIN (POINT A)</span>
+            <h4 class="font-bold text-slate-900">Origin Point</h4>
+          </div>
+        `);
+        const markerA = new maplibregl.Marker({ element: elA })
+          .setLngLat(activeWard.originCoords)
+          .setPopup(popupA)
+          .addTo(map);
+        routePinMarkersRef.current.push(markerA);
 
-      // Point B (Destination): Classic small pin (18px) at Shivajinagar Station
-      const elB = document.createElement('div');
-      elB.className = 'w-[18px] h-[18px] rounded-sm bg-slate-900 border-2 border-white text-white font-mono text-[10px] font-bold flex items-center justify-center shadow-sm cursor-pointer transform hover:scale-125 transition-transform';
-      elB.innerText = 'B';
-      const popupB = new maplibregl.Popup({ offset: 10 }).setHTML(`
-        <div class="bg-white p-2.5 rounded-sm border border-slate-200 text-slate-900 shadow-sm text-xs font-sans">
-          <span class="text-[10px] font-mono text-slate-700 font-bold uppercase">DESTINATION (POINT B)</span>
-          <h4 class="font-bold text-slate-900">Shivajinagar Station Reconnect</h4>
-        </div>
-      `);
-      const markerB = new maplibregl.Marker({ element: elB })
-        .setLngLat(activeWard.destinationCoords)
-        .setPopup(popupB)
-        .addTo(map);
-      routePinMarkersRef.current.push(markerB);
+        // Point B (Destination): Classic small pin (18px)
+        const elB = document.createElement('div');
+        elB.className = 'w-[18px] h-[18px] rounded-sm bg-slate-900 border-2 border-white text-white font-mono text-[10px] font-bold flex items-center justify-center shadow-sm cursor-pointer transform hover:scale-125 transition-transform';
+        elB.innerText = 'B';
+        const popupB = new maplibregl.Popup({ offset: 10 }).setHTML(`
+          <div class="bg-white p-2.5 rounded-sm border border-slate-200 text-slate-900 shadow-sm text-xs font-sans">
+            <span class="text-[10px] font-mono text-slate-700 font-bold uppercase">DESTINATION (POINT B)</span>
+            <h4 class="font-bold text-slate-900">Safe Reconnect</h4>
+          </div>
+        `);
+        const markerB = new maplibregl.Marker({ element: elB })
+          .setLngLat(activeWard.destinationCoords)
+          .setPopup(popupB)
+          .addTo(map);
+        routePinMarkersRef.current.push(markerB);
+      }
 
       // Single Incident Choke Point Marker (Sancheti Circle Underpass): Neat octagonal red road-closure icon
       activeWard.chokePoints.forEach((choke) => {
         const elChoke = document.createElement('div');
         elChoke.className = 'cursor-pointer transform hover:scale-105 transition-transform';
         elChoke.innerHTML = `
-          <div class="flex items-center gap-1.5 bg-rose-600 text-white font-sans text-xs font-bold px-2.5 py-1 rounded-sm shadow-sm border border-rose-400">
-            <span class="w-2 h-2 rounded-sm bg-white "></span>
-            <span>Closed · Waterlogged ${choke.depthCm} cm</span>
+          <div class="flex flex-col bg-rose-600 text-white font-sans text-[10px] font-bold px-2 py-1 rounded-sm shadow-sm border border-rose-400 leading-tight">
+            <span class="block">${choke.name}</span>
+            <span class="font-normal opacity-90">Closed · Water depth ~${choke.depthCm} cm</span>
           </div>
         `;
 
@@ -450,6 +491,79 @@ export default function MapLibreFloodMap({
     });
   }, [activeWard, mapLoaded]);
 
+  // Overpass API - Dynamic Infrastructure
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapLoaded || !activeWard) return;
+
+    const fetchOverpass = async () => {
+      try {
+        const query = `
+          [out:json];
+          (
+            node["amenity"="hospital"](around:2500, ${activeWard.center[1]}, ${activeWard.center[0]});
+            node["amenity"="fire_station"](around:2500, ${activeWard.center[1]}, ${activeWard.center[0]});
+          );
+          out body;
+        `;
+        const res = await fetch(`https://overpass-api.de/api/interpreter`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: `data=${encodeURIComponent(query)}`
+        });
+        
+        if (!res.ok) {
+          console.warn("Overpass API returned status:", res.status);
+          return;
+        }
+        
+        const text = await res.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          console.warn("Overpass API returned invalid JSON:", text.substring(0, 100));
+          return;
+        }
+        
+        overpassMarkersRef.current.forEach(m => m.remove());
+        overpassMarkersRef.current = [];
+
+        data.elements.forEach((el: any) => {
+          if (!el.lat || !el.lon) return;
+          const isHospital = el.tags?.amenity === 'hospital';
+          const name = el.tags?.name || (isHospital ? 'Hospital' : 'Fire Station');
+          
+          const icon = document.createElement('div');
+          icon.className = `w-5 h-5 rounded-full flex items-center justify-center text-white text-[10px] shadow-sm border border-white cursor-pointer transform hover:scale-125 transition-transform ${isHospital ? 'bg-rose-500' : 'bg-orange-500'}`;
+          icon.innerHTML = isHospital ? '🏥' : '🚒';
+
+          const popup = new maplibregl.Popup({ offset: 15 }).setHTML(`
+            <div class="bg-white p-2.5 rounded-sm border border-slate-200 text-slate-900 shadow-sm font-sans text-xs">
+              <span class="text-[10px] font-mono text-slate-500 font-bold uppercase tracking-wider">${isHospital ? 'HOSPITAL' : 'FIRE STATION'}</span>
+              <h4 class="text-sm font-bold text-slate-900 mt-0.5">${name}</h4>
+            </div>
+          `);
+
+          const marker = new maplibregl.Marker({ element: icon })
+            .setLngLat([el.lon, el.lat])
+            .setPopup(popup)
+            .addTo(map);
+            
+          overpassMarkersRef.current.push(marker);
+        });
+      } catch (err) {
+        console.warn("Overpass API failed", err);
+      }
+    };
+    
+    // Slight delay to not block the main flyTo animation
+    const timeout = setTimeout(fetchOverpass, 500);
+    return () => clearTimeout(timeout);
+  }, [activeWard, mapLoaded]);
+
   // Render Drainage Nodes as Subtle 3px Neutral Dots (No Overlapping Text Pills)
   useEffect(() => {
     const map = mapRef.current;
@@ -545,7 +659,7 @@ export default function MapLibreFloodMap({
     `;
 
     const popup = new maplibregl.Popup({ closeButton: true, maxWidth: '300px', offset: 12 })
-      .setLngLat(props.coordinates || PUNE_CENTER)
+      .setLngLat(props.coordinates || MUMBAI_CENTER)
       .setHTML(popupHtml)
       .addTo(map);
 
@@ -629,12 +743,14 @@ export default function MapLibreFloodMap({
       if (map.getLayer('primary-flooded-route-line')) map.setLayoutProperty('primary-flooded-route-line', 'visibility', visibility);
       if (map.getLayer('safe-bypass-route-glow')) map.setLayoutProperty('safe-bypass-route-glow', 'visibility', visibility);
       if (map.getLayer('safe-bypass-route-line')) map.setLayoutProperty('safe-bypass-route-line', 'visibility', visibility);
+    } else if (layerKey === 'dopplerRadar') {
+      if (map.getLayer('rainviewer-layer')) map.setLayoutProperty('rainviewer-layer', 'visibility', visibility);
     }
   };
 
   const resetCamera = () => {
     if (mapRef.current) {
-      const center = activeWard ? activeWard.center : PUNE_CENTER;
+      const center = activeWard ? activeWard.center : MUMBAI_CENTER;
       mapRef.current.flyTo({ center, zoom: 14, essential: true });
     }
   };
@@ -644,8 +760,9 @@ export default function MapLibreFloodMap({
       <div ref={mapContainerRef} className="w-full h-full min-h-[500px] flex-1 relative" />
 
       {/* Floating Layer Control Bar */}
-      <div className="absolute top-4 left-4 z-10 flex flex-wrap items-center gap-2">
-        <div className="bg-white/95 backdrop-blur-md border border-slate-200/90 p-1.5 rounded-sm shadow-xs flex items-center gap-1 text-xs">
+      {showLayerControl && (
+        <div className="absolute top-4 left-4 z-10 flex flex-wrap items-center gap-2">
+          <div className="bg-white/95 backdrop-blur-md border border-slate-200/90 p-1.5 rounded-sm shadow-xs flex items-center gap-1 text-xs">
           <Layers className="w-4 h-4 text-slate-500 ml-1.5" />
           <button
             onClick={() => toggleLayer('inundationZones')}
@@ -671,6 +788,14 @@ export default function MapLibreFloodMap({
           >
             Navigation Overlay
           </button>
+          <button
+            onClick={() => toggleLayer('dopplerRadar')}
+            className={`px-2.5 py-1 rounded-sm text-[11px] font-semibold transition-all cursor-pointer ${
+              activeLayers.dopplerRadar ? 'bg-slate-100 text-slate-900 font-bold border border-slate-200' : 'text-slate-500 hover:text-slate-900'
+            }`}
+          >
+            Doppler Radar
+          </button>
         </div>
 
         <button
@@ -681,20 +806,25 @@ export default function MapLibreFloodMap({
           <span className="hidden sm:inline">Reset View</span>
         </button>
       </div>
+      )}
 
       {/* Floating Google Maps Route Summary Card at Bottom Center */}
-      {showBypassOverlay && activeWard && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 bg-white/95 backdrop-blur-md border border-slate-200/90 px-4 py-2.5 rounded-sm shadow-sm flex items-center gap-3 text-xs text-slate-900 font-semibold  slide-in- max-w-md">
+      {showBypassOverlay && activeWard && activeWard.safeBypassGeoJSON?.features?.[0] ? (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 bg-white/95 backdrop-blur-md border border-slate-200/90 px-4 py-2.5 rounded-sm shadow-sm flex items-center gap-3 text-xs text-slate-900 font-semibold w-max max-w-[500px]">
           <div className="w-3 h-3 rounded-sm bg-emerald-500 shrink-0 "></div>
           <div className="truncate">
-            <span className="text-slate-900 font-bold">Via FC Road Flyover</span>
+            <span className="text-slate-900 font-bold">{activeWard.safeBypassGeoJSON.features[0].properties?.name}</span>
             <span className="text-slate-400 font-normal mx-1.5">•</span>
             <span className="text-emerald-700 font-bold font-mono">{activeWard.etaBypassMins} min</span>
             <span className="text-slate-400 font-normal mx-1.5">•</span>
-            <span className="text-slate-500 font-medium truncate">Avoids {activeWard.predictedWaterDepthCm} cm flood at Sancheti Circle</span>
+            <span className="text-slate-500 font-medium truncate">{activeWard.bypassAdvice}</span>
           </div>
         </div>
-      )}
+      ) : showBypassOverlay && activeWard ? (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 bg-white/95 backdrop-blur-md border border-slate-200/90 px-4 py-2.5 rounded-sm shadow-sm flex items-center gap-3 text-xs text-slate-900 font-semibold w-max max-w-[500px]">
+          <span className="text-slate-500 font-medium truncate">No safe route available for this area.</span>
+        </div>
+      ) : null}
 
       {/* Legend */}
       <div className="absolute bottom-4 right-4 z-10 bg-white/95 backdrop-blur-md border border-slate-200 p-3 rounded-sm shadow-xs text-xs space-y-1.5 max-w-xs">

@@ -5,12 +5,22 @@ import { useDemo } from '@/context/DemoContext';
 import { InteractiveMap } from '@/components/map/InteractiveMap';
 import { MetricCard } from '@/components/ui/MetricCard';
 import { Navigation, ShieldCheck, AlertTriangle, MapPin, Clock, ArrowRight, Check } from 'lucide-react';
+import { MUMBAI_WARDS_DATA } from '@/data/mumbaiWardsData';
 
 export default function RoutingPage() {
   const { stepState, selectedArea } = useDemo();
   const [selectedRoute, setSelectedRoute] = useState<'safest' | 'fastest'>('safest');
 
-  const isFlooded = stepState.maxWaterDepthCm > 20;
+  const isShiv = selectedArea.id === 'hindmata';
+  const activeDepth = isShiv ? stepState.maxWaterDepthCm : selectedArea.waterDepthCm;
+  const isFlooded = activeDepth > 20;
+  
+  const activeWard = MUMBAI_WARDS_DATA.find(w => w.id === selectedArea.id);
+  const safestRouteName = activeWard?.safeBypassGeoJSON?.features?.[0]?.properties?.name || 'No safe route available';
+  const fastestRouteName = activeWard?.floodedRouteGeoJSON?.features?.[0]?.properties?.name || 'Direct Route';
+  const safestTime = activeWard?.etaBypassMins || '--';
+  const fastestTime = activeWard?.etaNormalMins || '--';
+  const riskDelay = isShiv ? stepState.routingState.riskDelayMins : (activeWard ? activeWard.etaBypassMins - activeWard.etaNormalMins : 0);
 
   return (
     <div className="space-y-6">
@@ -34,7 +44,7 @@ export default function RoutingPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <MetricCard
           title="Safest evacuation route"
-          value="FC Road Flyover"
+          value={safestRouteName}
           subtitle="0 cm predicted water depth"
           icon={ShieldCheck}
           variant="emerald"
@@ -42,17 +52,17 @@ export default function RoutingPage() {
         <MetricCard
           title="Subway obstruction status"
           value={isFlooded ? 'Flooded' : 'Passable'}
-          subtitle={isFlooded ? `${stepState.maxWaterDepthCm} cm depth at underpass` : 'Normal traffic velocity'}
+          subtitle={isFlooded ? `${activeDepth} cm depth at underpass` : 'Normal traffic velocity'}
           icon={AlertTriangle}
           variant={isFlooded ? 'red' : 'emerald'}
         />
         <MetricCard
           title="Reroute travel delay"
-          value={`+${stepState.routingState.riskDelayMins}`}
+          value={`+${riskDelay}`}
           unit="min"
           subtitle="Additional travel time"
           icon={Clock}
-          variant={stepState.routingState.riskDelayMins > 10 ? 'amber' : 'emerald'}
+          variant={riskDelay > 10 ? 'amber' : 'emerald'}
         />
       </div>
 
@@ -83,7 +93,7 @@ export default function RoutingPage() {
 
             <div>
               <h3 className="text-base font-bold text-slate-900">
-                FC Road Flyover via Sancheti Upper Ramp
+                {safestRouteName}
               </h3>
               <p className="text-xs text-slate-600 font-normal mt-1">
                 Elevated overpass route bypassing low-lying JM Road underpass sump entirely.
@@ -97,7 +107,7 @@ export default function RoutingPage() {
               </div>
               <div>
                 <span className="text-slate-500 block text-[11px]">Est. Time</span>
-                <strong>~9 min</strong>
+                <strong>~{safestTime} min</strong>
               </div>
               <div>
                 <span className="text-slate-500 block text-[11px]">Hazard Risk</span>
@@ -120,13 +130,13 @@ export default function RoutingPage() {
                 Fastest Route (Use with caution)
               </span>
               <span className="text-xs font-semibold text-amber-700">
-                {stepState.maxWaterDepthCm} cm water depth
+                {activeDepth} cm water depth
               </span>
             </div>
 
             <div>
               <h3 className="text-base font-bold text-slate-900">
-                JM Road Underpass Direct Arterial
+                {fastestRouteName}
               </h3>
               <p className="text-xs text-slate-600 font-normal mt-1">
                 Direct low-level underpass route. Subject to waterlogging pooling during heavy downpours.
@@ -140,7 +150,7 @@ export default function RoutingPage() {
               </div>
               <div>
                 <span className="text-slate-500 block text-[11px]">Est. Time</span>
-                <strong>~7 min</strong>
+                <strong>~{fastestTime} min</strong>
               </div>
               <div>
                 <span className="text-slate-500 block text-[11px]">Hazard Risk</span>

@@ -43,7 +43,7 @@ export const GoogleMapView: React.FC<GoogleMapViewProps> = ({
     emergencyRoutes: true,
   });
 
-  const waterDepth = selectedArea.id === 'shivajinagar' ? stepState.maxWaterDepthCm : selectedArea.waterDepthCm;
+  const waterDepth = selectedArea.id === 'hindmata' ? stepState.maxWaterDepthCm : selectedArea.waterDepthCm;
   const isFlooded = waterDepth > 20;
 
   const handleToggleLayer = (layerKey: keyof MapLayerState) => {
@@ -245,7 +245,7 @@ export const GoogleMapView: React.FC<GoogleMapViewProps> = ({
   ) => {
     clearAllOverlays();
 
-    if (selectedArea.id === 'shivajinagar') {
+    if (selectedArea.id === 'hindmata') {
       const ringCoords = [
         { lat: 18.5348, lng: 73.8424 },
         { lat: 18.5352, lng: 73.8504 },
@@ -366,7 +366,7 @@ export const GoogleMapView: React.FC<GoogleMapViewProps> = ({
       fillOpacity: 0.25,
       weight: 2,
     }).addTo(map);
-    riskPolygon.bindPopup(`<strong>Shivajinagar Flood Risk Zone</strong><br/>Predicted Water Depth: <strong>${waterDepth} cm</strong>`);
+    riskPolygon.bindPopup(`<strong>Hindmata Flood Risk Zone</strong><br/>Predicted Water Depth: <strong>${waterDepth} cm</strong>`);
     polygonsRef.current.push(riskPolygon);
 
     pipes.forEach((pipe) => {
@@ -490,7 +490,7 @@ export const GoogleMapView: React.FC<GoogleMapViewProps> = ({
             }
           }}
           className="absolute bottom-4 right-14 bg-white/90 backdrop-blur-md p-2 rounded-sm border border-slate-200 shadow-sm text-slate-700 hover:text-slate-900 z-10 transition-colors cursor-pointer"
-          title="Reset camera to selected area (Shivajinagar)"
+          title="Reset camera to selected area (Hindmata)"
         >
           <Locate className="w-4 h-4" />
         </button>

@@ -1,10 +1,10 @@
 // Emergency Transit Pathfinding & Flood Avoidance Routing Engine for FloodTwin
 import {
-  PUNE_ROAD_NODES,
-  PUNE_ROAD_SEGMENTS,
+  MUMBAI_ROAD_NODES,
+  MUMBAI_ROAD_SEGMENTS,
   RoadNode,
   RoadSegment,
-} from '@/data/puneDrainageNetwork';
+} from '@/data/mumbaiDrainageNetwork';
 import { CalculatedNodeState } from './drainageGraphEngine';
 
 export interface RouteResult {
@@ -34,15 +34,15 @@ export function computeEmergencyRoutes(
   const isSanchetiBlocked = sanchetiDepth >= wadingThresholdCm;
 
   // Standard Route (Direct through Sancheti Underpass)
-  const standardSegments = PUNE_ROAD_SEGMENTS.filter(
+  const standardSegments = MUMBAI_ROAD_SEGMENTS.filter(
     (s) => s.id === 'RS-01' || s.id === 'RS-03'
   );
   const standardDist = standardSegments.reduce((acc, s) => acc + s.distanceMeters, 0);
   const standardDelayPenalty = isSanchetiBlocked ? Math.round(sanchetiDepth * 0.4) : 0;
   const standardTimeMins = Math.round((standardDist / 600) + standardDelayPenalty);
 
-  // Safest Emergency Bypass Route (Bypasses Sancheti Circle via FC Road & Shivajinagar Flyover)
-  const safeSegments = PUNE_ROAD_SEGMENTS.filter(
+  // Safest Emergency Bypass Route (Bypasses Sancheti Circle via FC Road & Hindmata Flyover)
+  const safeSegments = MUMBAI_ROAD_SEGMENTS.filter(
     (s) => s.id === 'RS-02' || s.id === 'RS-04'
   );
   const safeDist = safeSegments.reduce((acc, s) => acc + s.distanceMeters, 0);
@@ -103,7 +103,7 @@ export function computeEmergencyRoutes(
   const safestRoute: RouteResult = {
     id: 'safest',
     title: 'Emergency Flood-Aware Route',
-    description: 'Elevated bypass routing around Sancheti Circle via FC Road & Shivajinagar Station.',
+    description: 'Elevated bypass routing around Sancheti Circle via FC Road & Hindmata Station.',
     totalDistanceMeters: safeDist,
     estimatedTimeMins: safeTimeMins,
     avoidedChokePoints: isSanchetiBlocked ? ['JM Road Sancheti Circle Underpass'] : [],

@@ -14,10 +14,17 @@ import {
   Activity,
   MapPin,
 } from 'lucide-react';
-import { PUNE_AREAS } from '@/data/searchData';
+import { MUMBAI_AREAS } from '@/data/searchData';
 
 export default function OperationsCenterPage() {
-  const { stepState, selectedArea } = useDemo();
+  const { stepState, selectedArea, setSelectedAreaId } = useDemo();
+  
+  const isShiv = selectedArea.id === 'hindmata';
+  const activeDepth = isShiv ? stepState.maxWaterDepthCm : selectedArea.waterDepthCm;
+  const activeRain = isShiv ? stepState.rainfallMmHr : selectedArea.rainfallMmHr;
+  const activeCapacity = isShiv ? stepState.drainageCapacityPct : selectedArea.drainageCapacityPct;
+  const activeTime = isShiv ? stepState.timeToCriticalMins : selectedArea.timeToCriticalMins;
+  const depthSubtitle = isShiv ? "JM Underpass Sump" : (selectedArea.affectedRoads[0] || "Key area");
 
   return (
     <div className="space-y-6">
@@ -29,7 +36,7 @@ export default function OperationsCenterPage() {
           </div>
           <div>
             <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
-              <span>Pune Municipal Corporation</span>
+              <span>Demonstration Region</span>
               <span>•</span>
               <span className="text-orange-400 font-bold flex items-center gap-1">
                 <MapPin className="w-3.5 h-3.5" />
@@ -43,40 +50,38 @@ export default function OperationsCenterPage() {
         </div>
       </div>
 
-      {/* Top Metrics Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <MetricCard
-          title="Max Inundation Depth"
-          value={stepState.maxWaterDepthCm}
-          unit="cm"
-          subtitle="JM Underpass Sump"
-          icon={Waves}
-          variant={stepState.maxWaterDepthCm >= 40 ? 'red' : stepState.maxWaterDepthCm >= 20 ? 'amber' : 'emerald'}
-        />
-        <MetricCard
-          title="Live Rainfall Rate"
-          value={stepState.rainfallMmHr}
-          unit="mm/hr"
-          subtitle="Doppler Radar Grid"
-          icon={CloudRain}
-          variant={stepState.rainfallMmHr >= 60 ? 'red' : stepState.rainfallMmHr >= 30 ? 'amber' : 'cyan'}
-        />
-        <MetricCard
-          title="Trunk Pipe Capacity"
-          value={stepState.drainageCapacityPct}
-          unit="%"
-          subtitle="Hydraulic Network Load"
-          icon={GitMerge}
-          variant={stepState.drainageCapacityPct >= 80 ? 'red' : stepState.drainageCapacityPct >= 50 ? 'amber' : 'emerald'}
-        />
-        <MetricCard
-          title="Time to Critical"
-          value={stepState.timeToCriticalMins ? `~${stepState.timeToCriticalMins}` : 'Safe'}
-          unit={stepState.timeToCriticalMins ? 'min' : ''}
-          subtitle="Lead Time Countdown"
-          icon={Activity}
-          variant={stepState.timeToCriticalMins ? 'amber' : 'emerald'}
-        />
+      {/* Area Snapshot */}
+      <div className="bg-white border border-slate-200 rounded-sm p-4 shadow-xs">
+        <div className="flex flex-wrap md:flex-nowrap items-center divide-y md:divide-y-0 md:divide-x divide-slate-200">
+           <div className="flex-1 flex flex-col py-2 md:py-0 px-4 first:pl-2 last:pr-2">
+             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Water Depth</span>
+             <div className="flex items-baseline gap-1">
+               <span className="text-xl font-extrabold text-slate-900">{activeDepth}</span>
+               <span className="text-xs font-bold text-slate-600 whitespace-nowrap">cm</span>
+             </div>
+           </div>
+           <div className="flex-1 flex flex-col py-2 md:py-0 px-4">
+             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Rainfall</span>
+             <div className="flex items-baseline gap-1">
+               <span className="text-xl font-extrabold text-slate-900">{activeRain}</span>
+               <span className="text-xs font-bold text-slate-600 whitespace-nowrap">mm/hr</span>
+             </div>
+           </div>
+           <div className="flex-1 flex flex-col py-2 md:py-0 px-4">
+             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Drainage Load</span>
+             <div className="flex items-baseline gap-1">
+               <span className="text-xl font-extrabold text-slate-900">{activeCapacity}</span>
+               <span className="text-xs font-bold text-slate-600 whitespace-nowrap">%</span>
+             </div>
+           </div>
+           <div className="flex-1 flex flex-col py-2 md:py-0 px-4">
+             <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Time to critical</span>
+             <div className="flex items-baseline gap-1">
+               <span className="text-xl font-extrabold text-slate-900">{activeTime ? `~${activeTime}` : 'Safe'}</span>
+               <span className="text-xs font-bold text-slate-600 whitespace-nowrap">{activeTime ? 'min' : ''}</span>
+             </div>
+           </div>
+        </div>
       </div>
 
       {/* Dominant Layout: GIS Map + Active Alert & Interventions */}
@@ -88,7 +93,7 @@ export default function OperationsCenterPage() {
               <Radio className="w-4 h-4 text-orange-500" />
               <span>GIS Spatial Overview ({selectedArea.name})</span>
             </span>
-            <span className="text-[11px] text-slate-500 font-mono">Simulated infrastructure layer</span>
+            <span className="text-[11px] text-slate-500 font-mono">Simulation data</span>
           </div>
 
           <InteractiveMap heightClass="h-[550px]" />
@@ -108,14 +113,37 @@ export default function OperationsCenterPage() {
               </span>
             </div>
 
-            {stepState.activeAlert ? (
-              <div className="space-y-3">
-                <h3 className="text-sm font-bold text-slate-900 leading-snug">
+            {isShiv && stepState.activeAlert ? (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-2 mb-2">
+                  <div className="bg-slate-50 p-2 border border-slate-200">
+                    <span className="block text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Priority</span>
+                    <span className={`block text-xs font-bold capitalize ${stepState.activeAlert.severity === 'critical' ? 'text-red-700' : 'text-slate-900'}`}>{stepState.activeAlert.severity}</span>
+                  </div>
+                  <div className="bg-slate-50 p-2 border border-slate-200">
+                    <span className="block text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Event type</span>
+                    <span className="block text-xs font-bold text-slate-900 capitalize">{stepState.activeAlert.type}</span>
+                  </div>
+                  <div className="bg-slate-50 p-2 border border-slate-200">
+                    <span className="block text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Expected rainfall</span>
+                    <span className="block text-xs font-bold text-slate-900">{stepState.rainfallMmHr} mm/hr</span>
+                  </div>
+                  <div className="bg-slate-50 p-2 border border-slate-200">
+                    <span className="block text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Time Window</span>
+                    <span className="block text-xs font-bold text-slate-900">{stepState.timeToCriticalMins ? `~${stepState.timeToCriticalMins} mins` : 'Immediate'}</span>
+                  </div>
+                </div>
+
+                <h3 className="text-sm font-bold text-slate-900 leading-snug border-b border-slate-200 pb-2">
                   {stepState.activeAlert.title}
                 </h3>
-                <p className="text-xs text-slate-600 leading-relaxed font-normal">
-                  {stepState.activeAlert.description}
-                </p>
+                
+                <div className="space-y-1">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Why it matters</span>
+                  <p className="text-xs text-slate-600 leading-relaxed font-normal">
+                    {stepState.activeAlert.description}
+                  </p>
+                </div>
 
                 <div className="bg-slate-50 p-3.5 rounded-sm border border-slate-200 space-y-1">
                   <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">
@@ -126,21 +154,63 @@ export default function OperationsCenterPage() {
                   </p>
                 </div>
               </div>
+            ) : selectedArea.status !== 'NORMAL' ? (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-2 mb-2">
+                  <div className="bg-slate-50 p-2 border border-slate-200">
+                    <span className="block text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Priority</span>
+                    <span className={`block text-xs font-bold capitalize ${selectedArea.status === 'CRITICAL' ? 'text-red-700' : 'text-slate-900'}`}>{selectedArea.status.toLowerCase()}</span>
+                  </div>
+                  <div className="bg-slate-50 p-2 border border-slate-200">
+                    <span className="block text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Event type</span>
+                    <span className="block text-xs font-bold text-slate-900">Inundation Threat</span>
+                  </div>
+                  <div className="bg-slate-50 p-2 border border-slate-200">
+                    <span className="block text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Expected rainfall</span>
+                    <span className="block text-xs font-bold text-slate-900">{selectedArea.rainfallMmHr} mm/hr</span>
+                  </div>
+                  <div className="bg-slate-50 p-2 border border-slate-200">
+                    <span className="block text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Time Window</span>
+                    <span className="block text-xs font-bold text-slate-900">{selectedArea.predictionFactors?.leadTimeMins ? `~${selectedArea.predictionFactors.leadTimeMins} mins` : 'N/A'}</span>
+                  </div>
+                </div>
+
+                <h3 className="text-sm font-bold text-slate-900 leading-snug border-b border-slate-200 pb-2">
+                  {selectedArea.predictionFactors?.explanation || `Critical Risk in ${selectedArea.name}`}
+                </h3>
+
+                <div className="space-y-1">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Why it matters</span>
+                  <p className="text-xs text-slate-600 leading-relaxed font-normal">
+                    {selectedArea.description}
+                  </p>
+                </div>
+
+                <div className="bg-slate-50 p-3.5 rounded-sm border border-slate-200 space-y-1">
+                  <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">
+                    Recommended Action
+                  </span>
+                  <p className="text-xs text-slate-900 font-bold">
+                    {selectedArea.interventionRationale?.recommendedAction || 'Monitor situation closely.'}
+                  </p>
+                </div>
+              </div>
             ) : (
-              <p className="text-xs text-slate-500 font-normal">All Pune municipal sectors baseline normal.</p>
+              <p className="text-xs text-slate-500 font-normal">All {selectedArea.name} sectors baseline normal.</p>
             )}
           </div>
 
           {/* Sector Status Matrix */}
           <div className="bg-white border border-slate-200 rounded-sm p-6 shadow-xs space-y-3">
             <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider border-b border-slate-200 pb-2">
-              PMC Sector Status Matrix
+              Area Status Matrix
             </h4>
             <div className="space-y-2">
-              {Object.values(PUNE_AREAS).map((area) => (
+              {Object.values(MUMBAI_AREAS).map((area) => (
                 <div
                   key={area.id}
-                  className="flex items-center justify-between p-2.5 rounded-sm bg-slate-50 border border-slate-200 text-xs"
+                  onClick={() => setSelectedAreaId(area.id)}
+                  className="flex items-center justify-between p-2.5 rounded-sm bg-slate-50 border border-slate-200 text-xs cursor-pointer hover:bg-slate-100 transition-colors"
                 >
                   <div className="font-bold text-slate-900">{area.name}</div>
                   <span

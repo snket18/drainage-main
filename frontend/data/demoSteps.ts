@@ -1,7 +1,7 @@
 export interface DemoStepState {
   stepIndex: number; // 0 to 7
   stepCode: 'PREDICT' | 'PREVENT' | 'DETECT' | 'VERIFY' | 'DIAGNOSE' | 'RESPOND' | 'VERIFY_RESOLUTION' | 'RESOLVE';
-  phase: 'BEFORE FLOOD' | 'FLOOD OCCURS' | 'RESOLUTION';
+  phase: 'PRE-FLOOD' | 'FLOOD OCCURS' | 'RESOLUTION';
   title: string;
   subtitle: string;
   badgeText: string;
@@ -56,7 +56,7 @@ export const DEMO_STEPS: DemoStepState[] = [
   {
     stepIndex: 0,
     stepCode: 'PREDICT',
-    phase: 'BEFORE FLOOD',
+    phase: 'PRE-FLOOD',
     title: '1. Rainfall Nowcast Prediction',
     subtitle: 'Doppler Radar detects convective cloud front approaching catchment area',
     badgeText: 'HEAVY RAIN PROJECTED IN ~30 MIN',
@@ -73,23 +73,23 @@ export const DEMO_STEPS: DemoStepState[] = [
       type: 'preventive',
       severity: 'medium',
       title: 'Convective Storm Approaching Catchment',
-      description: 'Doppler Weather Radar projects rainfall velocity of 35-45 mm/hr within 30 minutes.',
+      description: 'Doppler Weather Radar projects rainfall intensity of 35-45 mm/hr within 30 minutes.',
       recommendedAction: 'Inspect storm grates and prepare sluice gate pre-discharge.',
     },
     cctvStatus: {
-      cameraName: 'JM Road Underpass',
+      cameraName: 'Hindmata Underpass Underpass',
       aiWaterDetected: false,
       depthCm: 12,
       speedKmph: 42,
     },
     interventionState: {
-      recommended: 'Pre-clear Culvert C-14 & position Pump Unit #4 on standby',
+      recommended: 'Pre-clear Britannia Outfall & position Pump Unit #4 on standby',
       status: 'PREVENTIVE ADVISORY',
-      targetLocation: 'JM Road Underpass',
+      targetLocation: 'Hindmata Underpass Underpass',
     },
     routingState: {
       jmRoadStatus: 'OPEN',
-      safestRouteVia: 'JM Road Direct',
+      safestRouteVia: 'Hindmata Underpass Direct',
       riskDelayMins: 0,
     },
     fieldWorkerState: {
@@ -103,7 +103,7 @@ export const DEMO_STEPS: DemoStepState[] = [
   {
     stepIndex: 1,
     stepCode: 'PREVENT',
-    phase: 'BEFORE FLOOD',
+    phase: 'PRE-FLOOD',
     title: '2. Preventive Municipal Dispatch',
     subtitle: 'System calculates time-to-failure & issues pre-discharge order',
     badgeText: 'PREVENTIVE DISPATCH: SLUICE GATE #2',
@@ -124,19 +124,19 @@ export const DEMO_STEPS: DemoStepState[] = [
       recommendedAction: 'Execute Gate #2 opening (30%) & dispatch maintenance crew to clear silt trap.',
     },
     cctvStatus: {
-      cameraName: 'JM Road Underpass',
+      cameraName: 'Hindmata Underpass Underpass',
       aiWaterDetected: false,
       depthCm: 18,
       speedKmph: 35,
     },
     interventionState: {
-      recommended: 'Open Dengle Sluice Gate #2 (30%) for flood headroom',
+      recommended: 'Open Britannia Gate #2 (30%) for flood headroom',
       status: 'ACTION DISPATCHED',
-      targetLocation: 'Dengle Mutha Gate',
+      targetLocation: 'Dengle High Tide Gate',
     },
     routingState: {
       jmRoadStatus: 'WARNING',
-      safestRouteVia: 'JM Road (Slow traffic)',
+      safestRouteVia: 'Hindmata Underpass (Slow traffic)',
       riskDelayMins: 4,
     },
     fieldWorkerState: {
@@ -171,7 +171,7 @@ export const DEMO_STEPS: DemoStepState[] = [
       recommendedAction: 'Deploy Mobile Dewatering Pump #4 and restrict subway access.',
     },
     cctvStatus: {
-      cameraName: 'JM Road Underpass',
+      cameraName: 'Hindmata Underpass Underpass',
       aiWaterDetected: true,
       depthCm: 48,
       speedKmph: 0,
@@ -179,11 +179,11 @@ export const DEMO_STEPS: DemoStepState[] = [
     interventionState: {
       recommended: 'Deploy Mobile Dewatering Pump Unit #4 (500 HP, 1.2 m³/s rate)',
       status: 'ACTION REQUIRED',
-      targetLocation: 'JM Road Underpass Sump',
+      targetLocation: 'Hindmata Underpass Underpass Sump',
     },
     routingState: {
       jmRoadStatus: 'CLOSED_FLOODED',
-      safestRouteVia: 'FC Road Flyover (Safest Route)',
+      safestRouteVia: 'Dadar TT Flyover Flyover (Safest Route)',
       riskDelayMins: 14,
     },
     fieldWorkerState: {
@@ -218,7 +218,7 @@ export const DEMO_STEPS: DemoStepState[] = [
       recommendedAction: 'Issue traffic diversion & activate pumping intervention #PMP-04.',
     },
     cctvStatus: {
-      cameraName: 'JM Road Underpass',
+      cameraName: 'Hindmata Underpass Underpass',
       aiWaterDetected: true,
       depthCm: 48,
       speedKmph: 0,
@@ -226,11 +226,11 @@ export const DEMO_STEPS: DemoStepState[] = [
     interventionState: {
       recommended: 'Mobilize Dewatering Pump Unit #4 & close subway barrier',
       status: 'VERIFIED & EXECUTING',
-      targetLocation: 'JM Road Underpass',
+      targetLocation: 'Hindmata Underpass Underpass',
     },
     routingState: {
       jmRoadStatus: 'CLOSED_FLOODED',
-      safestRouteVia: 'FC Road Flyover (Rerouted)',
+      safestRouteVia: 'Dadar TT Flyover Flyover (Rerouted)',
       riskDelayMins: 14,
     },
     fieldWorkerState: {
@@ -246,7 +246,7 @@ export const DEMO_STEPS: DemoStepState[] = [
     stepCode: 'DIAGNOSE',
     phase: 'FLOOD OCCURS',
     title: '5. Hydraulic Cause Diagnosis',
-    subtitle: 'Hydrodynamic model pinpoints root cause: Culvert C-14 silt restriction + Mutha River surcharge',
+    subtitle: 'Hydrodynamic model pinpoints root cause: Britannia Outfall silt restriction + High Tide River surcharge',
     badgeText: 'DIAGNOSIS: CULVERT SILT (55%) + RIVER SURCHARGE',
     badgeVariant: 'yellow',
     rainfallMmHr: 60,
@@ -261,11 +261,11 @@ export const DEMO_STEPS: DemoStepState[] = [
       type: 'system',
       severity: 'high',
       title: 'Cause Diagnosis: Compound Bottleneck',
-      description: 'Mutha river stage height (3.1m) causes backwater head at outfall while Culvert C-14 is 55% silt-restricted.',
+      description: 'High Tide river stage height (3.1m) causes backwater head at outfall while Britannia Outfall is 55% silt-restricted.',
       recommendedAction: 'Divert storm flow to retention basin & run mobile pump at full discharge rate.',
     },
     cctvStatus: {
-      cameraName: 'JM Road Underpass',
+      cameraName: 'Hindmata Underpass Underpass',
       aiWaterDetected: true,
       depthCm: 44,
       speedKmph: 0,
@@ -277,7 +277,7 @@ export const DEMO_STEPS: DemoStepState[] = [
     },
     routingState: {
       jmRoadStatus: 'CLOSED_FLOODED',
-      safestRouteVia: 'FC Road Flyover',
+      safestRouteVia: 'Dadar TT Flyover Flyover',
       riskDelayMins: 12,
     },
     fieldWorkerState: {
@@ -312,19 +312,19 @@ export const DEMO_STEPS: DemoStepState[] = [
       recommendedAction: 'Maintain pumping until water depth reaches normal range (<15 cm).',
     },
     cctvStatus: {
-      cameraName: 'JM Road Underpass',
+      cameraName: 'Hindmata Underpass Underpass',
       aiWaterDetected: true,
       depthCm: 28,
       speedKmph: 15,
     },
     interventionState: {
-      recommended: 'Mobile Dewatering Pump #4 discharging water to Mutha river outfall',
+      recommended: 'Mobile Dewatering Pump #4 discharging water to High Tide river outfall',
       status: 'EXECUTING',
       targetLocation: 'JM Underpass Outfall',
     },
     routingState: {
       jmRoadStatus: 'CLEARING',
-      safestRouteVia: 'FC Road Flyover',
+      safestRouteVia: 'Dadar TT Flyover Flyover',
       riskDelayMins: 6,
     },
     fieldWorkerState: {
@@ -359,7 +359,7 @@ export const DEMO_STEPS: DemoStepState[] = [
       recommendedAction: 'Decommission Pump Unit #4 and reopen traffic lane.',
     },
     cctvStatus: {
-      cameraName: 'JM Road Underpass',
+      cameraName: 'Hindmata Underpass Underpass',
       aiWaterDetected: false,
       depthCm: 14,
       speedKmph: 38,
@@ -367,11 +367,11 @@ export const DEMO_STEPS: DemoStepState[] = [
     interventionState: {
       recommended: 'Decommission Mobile Dewatering Pump Unit #4',
       status: 'VERIFYING COMPLETION',
-      targetLocation: 'JM Road Underpass',
+      targetLocation: 'Hindmata Underpass Underpass',
     },
     routingState: {
       jmRoadStatus: 'CLEARING',
-      safestRouteVia: 'JM Road Reopening',
+      safestRouteVia: 'Hindmata Underpass Reopening',
       riskDelayMins: 2,
     },
     fieldWorkerState: {
@@ -406,7 +406,7 @@ export const DEMO_STEPS: DemoStepState[] = [
       recommendedAction: 'No further action required. Baseline monitoring active.',
     },
     cctvStatus: {
-      cameraName: 'JM Road Underpass',
+      cameraName: 'Hindmata Underpass Underpass',
       aiWaterDetected: false,
       depthCm: 10,
       speedKmph: 45,
@@ -418,7 +418,7 @@ export const DEMO_STEPS: DemoStepState[] = [
     },
     routingState: {
       jmRoadStatus: 'OPEN',
-      safestRouteVia: 'JM Road Direct',
+      safestRouteVia: 'Hindmata Underpass Direct',
       riskDelayMins: 0,
     },
     fieldWorkerState: {
