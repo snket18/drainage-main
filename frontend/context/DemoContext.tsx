@@ -174,7 +174,7 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
       toast.success(
         '📱 Automated Dispatch Triggered!', {
           description: 'Bypass navigation route sent to Field Ops (Dadar TT) via WhatsApp API.',
-          duration: 10000,
+          duration: Infinity,
         }
       );
     }
@@ -182,7 +182,7 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
       toast.error(
         '🚨 Critical Alert Detected', {
           description: 'Water levels rising rapidly at Hindmata. Evacuation protocols recommended.',
-          duration: 5000,
+          duration: Infinity,
         }
       );
     }

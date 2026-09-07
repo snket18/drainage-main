@@ -30,7 +30,7 @@ export default function RootLayout({
             </div>
           </div>
           {/* Toast Notifications */}
-          <Toaster position="top-right" richColors theme="light" />
+          <Toaster position="top-right" richColors theme="light" closeButton />
         </DemoProvider>
       </body>
     </html>
