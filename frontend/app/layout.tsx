@@ -3,6 +3,7 @@ import './globals.css';
 import { DemoProvider } from '@/context/DemoContext';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TopHeader } from '@/components/layout/TopHeader';
+import { Toaster } from 'sonner';
 
 export const metadata: Metadata = {
   title: 'FloodTwin - Urban Flood Intelligence Platform',
@@ -28,6 +29,8 @@ export default function RootLayout({
               <main className="flex-1 p-6 overflow-y-auto bg-slate-50">{children}</main>
             </div>
           </div>
+          {/* Toast Notifications */}
+          <Toaster position="top-right" richColors theme="light" />
         </DemoProvider>
       </body>
     </html>

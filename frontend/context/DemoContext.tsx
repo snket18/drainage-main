@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import { DEMO_STEPS, DemoStepState } from '@/data/demoSteps';
 import {
   SENSORS_DATA,
@@ -82,9 +83,10 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const fetchBackendData = async () => {
       try {
+        const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5100';
         const [areasRes, sensorsRes] = await Promise.all([
-          fetch('http://localhost:5100/api/areas'),
-          fetch('http://localhost:5100/api/sensors')
+          fetch(`${API_BASE}/api/areas`),
+          fetch(`${API_BASE}/api/sensors`)
         ]);
         
         if (areasRes.ok) {
@@ -164,6 +166,27 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (interval) clearInterval(interval);
     };
   }, [isPlaying, selectedAreaId]);
+
+  // Automated Dispatch Notification Hook
+  useEffect(() => {
+    const step = DEMO_STEPS[currentStepIndex];
+    if (step.stepCode === 'RESPOND') {
+      toast.success(
+        '📱 Automated Dispatch Triggered!', {
+          description: 'Bypass navigation route sent to Field Ops (Dadar TT) via WhatsApp API.',
+          duration: 10000,
+        }
+      );
+    }
+    if (step.stepCode === 'DETECT') {
+      toast.error(
+        '🚨 Critical Alert Detected', {
+          description: 'Water levels rising rapidly at Hindmata. Evacuation protocols recommended.',
+          duration: 5000,
+        }
+      );
+    }
+  }, [currentStepIndex]);
 
   const setStepIndex = (index: number) => {
     if (index >= 0 && index < DEMO_STEPS.length) {
