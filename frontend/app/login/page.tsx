@@ -27,7 +27,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'signin' | 'signup'>('signin');
+
 
   // Strip trailing slash if present to prevent "//api" double-slash errors
   const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5100';
