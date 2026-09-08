@@ -99,10 +99,6 @@ export default function LoginPage() {
             </div>
           </div>
           
-          <h2 className="text-2xl font-medium text-slate-100 mb-10 leading-snug">
-            AI-powered urban flood intelligence <br />for a resilient Mumbai.
-          </h2>
-
           <div className="space-y-6">
             <div className="flex items-start gap-4">
               <div className="bg-white/10 p-2.5 rounded-lg border border-white/10 backdrop-blur-sm">
